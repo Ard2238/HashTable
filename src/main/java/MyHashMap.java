@@ -45,6 +45,18 @@ public class MyHashMap<K,V> {
         }
     }
 
+    public void remove(K key){
+        int index = this.getIndex(key);
+        MyLinkedList myLinkedList = this.bucketArray.get(index);
+        MyMapNode myMapNode = myLinkedList.head;
+        if(myMapNode.key.equals(key)){
+            myMapNode = myMapNode.next;
+        }
+        while(!myMapNode.next.key.equals(key))
+            myMapNode = myMapNode.next;
+        myMapNode.next = myMapNode.next.next;
+    }
+
     public void display(){
         for(MyLinkedList m : this.bucketArray){
             MyMapNode itr = m.head;

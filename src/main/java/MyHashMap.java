@@ -1,32 +1,58 @@
+import java.util.ArrayList;
+
 public class MyHashMap<K,V> {
-    MyLinkedList hashLinkedList;
-    public MyHashMap(){
-        hashLinkedList = new MyLinkedList();
+    private final int num_Buckets;
+    ArrayList<MyLinkedList<K>> bucketArray;
+
+    public MyHashMap() {
+        this.num_Buckets = 10;
+        this.bucketArray = new ArrayList<>(num_Buckets);
+
+        for (int i = 0; i < num_Buckets; i++) {
+            this.bucketArray.add(null);
+        }
+    }
+    public int getIndex(K key){
+        int hashCode = key.hashCode();
+        int index = hashCode % num_Buckets;
+        return  index;
     }
 
     public V getValue(K key){
-        MyMapNode<K,V> getNode = (MyMapNode<K,V>)this.hashLinkedList.searchNode(key);
-        if(getNode == null)
+        int index = this.getIndex(key);
+        MyLinkedList myLinkedList = this.bucketArray.get(index);
+        if(myLinkedList == null){
             return null;
-        else
-            return getNode.value;
+        }
+        MyMapNode<K,V> myMapNode = (MyMapNode<K,V>)myLinkedList.searchNode(key);
+        return (myMapNode == null) ? null : myMapNode.value;
     }
 
     public void addNode(K key,V value){
-        MyMapNode<K,V> node = (MyMapNode<K,V>)this.hashLinkedList.searchNode(key);
-        if(node == null){
-            node = new MyMapNode<>(key,value);
-            this.hashLinkedList.addNode(node);
-        }else
-            node.value = value;
+        int index = this.getIndex(key);
+        MyLinkedList<K> myLinkedList = this.bucketArray.get(index);
+        if(myLinkedList == null){
+            myLinkedList = new MyLinkedList<>();
+            this.bucketArray.set(index, myLinkedList);
+        }
+
+        MyMapNode <K,V> myMapNode = (MyMapNode<K,V>)myLinkedList.searchNode(key);
+        if(myMapNode == null){
+            myMapNode = new MyMapNode<>(key, value);
+            myLinkedList.addNode(myMapNode);
+        }else{
+            myMapNode.value = value;
+        }
     }
 
     public void display(){
-        MyMapNode itr = this.hashLinkedList.head;
-        System.out.println("HasMap : ");
-        while(itr != null){
-            System.out.print("{" + itr.key + ", " + itr.value + "}-->");
-            itr = itr.next;
+        for(MyLinkedList m : this.bucketArray){
+            MyMapNode itr = m.head;
+            while(itr != null){
+                System.out.print("{" + itr.key + "," + itr.value + "}-->");
+                itr = itr.next;
+            }
+            System.out.println();
         }
     }
 }
